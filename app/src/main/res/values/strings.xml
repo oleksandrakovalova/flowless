@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Flowless</string>
+    <string name="brush_settings">Brush settings</string>
+    <string name="type"> Type</string>
+    <string name="size">Size</string>
+    <string name="color">Color</string>
+    <string name="pressing_pen">Pressing pen</string>
+    <string name="marker">Marker</string>
+    <string name="highlighter">Highlighter</string>
+    <string name="dashed_line">Dashed line</string>
 </resources>
