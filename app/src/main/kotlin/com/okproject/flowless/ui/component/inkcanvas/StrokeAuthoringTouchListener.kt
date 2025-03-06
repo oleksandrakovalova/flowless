@@ -129,3 +129,13 @@ class StrokeAuthoringTouchListener(
         }
     }
 }
+
+fun View.setStrokeAuthoringTouchListenerWithBrush(brush: InkBrush) {
+    val motionEventPredictor = MotionEventPredictor.newInstance(this)
+    this.setOnTouchListener(
+        StrokeAuthoringTouchListener(
+            brush = brush,
+            motionEventPredictor = motionEventPredictor
+        )
+    )
+}

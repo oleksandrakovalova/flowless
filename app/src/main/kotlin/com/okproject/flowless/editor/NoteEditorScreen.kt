@@ -1,6 +1,5 @@
 package com.okproject.flowless.editor
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.okproject.flowless.mapper.BrushMapper
 import com.okproject.flowless.mapper.BrushTypeMapper
 import com.okproject.flowless.mapper.StrokeMapper
 import com.okproject.flowless.ui.component.inkcanvas.InkCanvas
@@ -56,20 +56,14 @@ fun NoteEditorScreen(
             )
         },
     ) { innerPadding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = innerPadding.calculateBottomPadding())
-        ) {
-            InkCanvas(
-                brushFamily = BrushTypeMapper.mapToBrushFamily(brush.brushType),
-                brushColor = brush.color,
-                brushSize = brush.size,
-                initialFinishedStrokes = StrokeMapper.mapToInkStrokes(finishedStrokes),
-                onStrokeFinished = {
-                    noteEditorViewModel.onStrokeFinished(StrokeMapper.mapToStrokes(it)) },
-                modifier = Modifier
-                    .fillMaxSize()
-            )
-        }
+        InkCanvas(
+            brush = BrushMapper.mapToInkBrush(brush),
+            initialFinishedStrokes = StrokeMapper.mapToInkStrokes(finishedStrokes),
+            onStrokeFinished = {
+                noteEditorViewModel.onStrokeFinished(StrokeMapper.mapToStrokes(it)) },
+            Modifier
+                .fillMaxSize()
+                .padding(bottom = innerPadding.calculateBottomPadding())
+        )
     }
 }

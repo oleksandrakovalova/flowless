@@ -3,7 +3,6 @@ package com.okproject.flowless.ui.component.inkcanvas
 import android.annotation.SuppressLint
 import android.graphics.Matrix
 import android.widget.FrameLayout
-import androidx.annotation.ColorLong
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,35 +14,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.ink.authoring.InProgressStrokeId
 import androidx.ink.authoring.InProgressStrokesFinishedListener
 import androidx.ink.authoring.InProgressStrokesView
-import androidx.ink.brush.Brush
-import androidx.ink.brush.BrushFamily
 import androidx.ink.rendering.android.canvas.CanvasStrokeRenderer
-import androidx.input.motionprediction.MotionEventPredictor
+import com.okproject.flowless.InkBrush
 import com.okproject.flowless.InkStroke
 
 @SuppressLint("ClickableViewAccessibility")
 @Composable
 fun InkCanvas(
-    brushFamily: BrushFamily,
-    @ColorLong brushColor: Long,
-    brushSize: Float,
+    brush: InkBrush,
     initialFinishedStrokes: Set<InkStroke>,
     onStrokeFinished: (Collection<InkStroke>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var finishedStrokes by remember { mutableStateOf(initialFinishedStrokes) }
-    val inProgressStrokesView: InProgressStrokesView = rememberInProgressStrokesView()
-    val strokeAuthoringTouchListener = rememberStrokeAuthoringTouchListener(
-        brushFamily = brushFamily,
-        brushColor = brushColor,
-        brushSize = brushSize,
-        view = inProgressStrokesView
-    )
 
     val canvasStrokeRenderer = CanvasStrokeRenderer.create()
 
@@ -52,8 +39,8 @@ fun InkCanvas(
             modifier = Modifier
                 .fillMaxSize()
                 .clipToBounds(),
-            factory = {
-                inProgressStrokesView.apply {
+            factory = { context ->
+                InProgressStrokesView(context).apply {
                     layoutParams =
                         FrameLayout.LayoutParams(
                             FrameLayout.LayoutParams.MATCH_PARENT,
@@ -68,11 +55,11 @@ fun InkCanvas(
                             }
                         }
                     )
-                    setOnTouchListener(strokeAuthoringTouchListener)
+                    setStrokeAuthoringTouchListenerWithBrush(brush)
                 }
             },
             update = { view ->
-                view.setOnTouchListener(strokeAuthoringTouchListener)
+                view.setStrokeAuthoringTouchListenerWithBrush(brush)
             }
         )
         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -89,29 +76,4 @@ fun InkCanvas(
             }
         }
     }
-}
-
-@Composable
-fun rememberInProgressStrokesView(): InProgressStrokesView {
-    val context = LocalContext.current
-    return remember { InProgressStrokesView(context) }
-}
-
-@SuppressLint("ClickableViewAccessibility")
-@Composable
-fun rememberStrokeAuthoringTouchListener(
-    brushFamily: BrushFamily,
-    brushColor: Long,
-    brushSize: Float,
-    view: InProgressStrokesView
-) = remember(brushFamily, brushColor, brushSize) {
-    StrokeAuthoringTouchListener(
-        brush = Brush.createWithColorLong(
-            family = brushFamily,
-            colorLong = brushColor,
-            size = brushSize,
-            epsilon = 0.1f
-        ),
-        motionEventPredictor = MotionEventPredictor.newInstance(view.rootView)
-    )
 }
