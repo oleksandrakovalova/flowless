@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.okproject.flowless.mapper.toBrushFamily
-import com.okproject.flowless.mapper.toChipItems
+import com.okproject.flowless.mapper.BrushTypeMapper
+import com.okproject.flowless.mapper.StrokeMapper
 import com.okproject.flowless.ui.component.inkcanvas.InkCanvas
 import com.okproject.flowless.ui.theme.Dimens
 import org.koin.androidx.compose.koinViewModel
@@ -24,9 +24,8 @@ fun NoteEditorScreen(
     noteEditorViewModel: NoteEditorViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
-    val brushType by noteEditorViewModel.brushType.collectAsStateWithLifecycle()
-    val brushSize by noteEditorViewModel.brushSize.collectAsStateWithLifecycle()
-    val brushColor by noteEditorViewModel.brushColor.collectAsStateWithLifecycle()
+    val brush by noteEditorViewModel.brush.collectAsStateWithLifecycle()
+    val finishedStrokes by noteEditorViewModel.finishedStrokes.collectAsStateWithLifecycle()
 
     val scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState()
 
@@ -40,29 +39,36 @@ fun NoteEditorScreen(
         sheetContent = {
             BrushSettingsSheet(
                 modifier = Modifier.padding(vertical = Dimens.defaultPadding),
-                selectedBrushType = brushType,
-                brushTypes = noteEditorViewModel.brushTypes.toChipItems(),
+                selectedBrushType = brush.brushType,
+                brushTypes = BrushTypeMapper.mapToChipItems(noteEditorViewModel.brushTypes),
                 onBrushTypeSelected = {
                     noteEditorViewModel.onBrushTypeSelected(it)
                 },
-                selectedBrushSize = brushSize,
+                selectedBrushSize = brush.size,
                 brushSizeRange = noteEditorViewModel.brushSizeRange,
                 onBrushSizeChanged = {
                     noteEditorViewModel.onBrushSizeChanged(it)
                 },
-                brushColor = brushColor,
+                brushColor = brush.color,
                 onBrushColorChanged = {
                     noteEditorViewModel.onBrushColorChanged(it)
                 }
             )
         },
     ) { innerPadding ->
-        Box(modifier = modifier.padding(innerPadding)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = innerPadding.calculateBottomPadding())
+        ) {
             InkCanvas(
-                brushFamily = brushType.toBrushFamily(),
-                brushColor = brushColor,
-                brushSize = brushSize,
-                modifier = Modifier.fillMaxSize()
+                brushFamily = BrushTypeMapper.mapToBrushFamily(brush.brushType),
+                brushColor = brush.color,
+                brushSize = brush.size,
+                initialFinishedStrokes = StrokeMapper.mapToInkStrokes(finishedStrokes),
+                onStrokeFinished = {
+                    noteEditorViewModel.onStrokeFinished(StrokeMapper.mapToStrokes(it)) },
+                modifier = Modifier
+                    .fillMaxSize()
             )
         }
     }

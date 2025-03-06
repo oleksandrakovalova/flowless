@@ -8,13 +8,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.ink.authoring.InProgressStrokeId
 import androidx.ink.authoring.InProgressStrokesView
-import androidx.ink.brush.Brush
 import androidx.input.motionprediction.MotionEventPredictor
+import com.okproject.flowless.InkBrush
 import com.okproject.flowless.ext.getPointerId
 import com.okproject.flowless.mapper.mapToStrokeAction
 
 class StrokeAuthoringTouchListener(
-    private val brush: Brush,
+    private val brush: InkBrush,
     private val motionEventPredictor: MotionEventPredictor
 ): View.OnTouchListener {
     private var currentPointerId by mutableStateOf<Int?>(null)

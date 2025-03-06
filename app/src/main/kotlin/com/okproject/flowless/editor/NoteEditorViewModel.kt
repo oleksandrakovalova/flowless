@@ -1,50 +1,54 @@
 package com.okproject.flowless.editor
 
-import androidx.annotation.ColorLong
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.okproject.flowless.domain.model.brush.Brush
+import com.okproject.flowless.domain.model.brush.BrushType
+import com.okproject.flowless.domain.model.stroke.Stroke
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.update
 
 
 class NoteEditorViewModel: ViewModel() {
-    private val _brushColor: MutableStateFlow<Long> = MutableStateFlow(DEFAULT_BRUSH_COLOR)
-    val brushColor: StateFlow<Long> = _brushColor.asStateFlow()
+    private val _brush: MutableStateFlow<Brush> = MutableStateFlow(
+        Brush(
+            size = DEFAULT_BRUSH_SIZE,
+            color = DEFAULT_BRUSH_COLOR,
+            epsilon = DEFAULT_BRUSH_EPSILON,
+            brushType = DEFAULT_BRUSH_TYPE
+        )
+    )
+    val brush: StateFlow<Brush> = _brush.asStateFlow()
 
-    private val _brushSize: MutableStateFlow<Float> = MutableStateFlow(DEFAULT_BRUSH_SIZE)
-    val brushSize: StateFlow<Float> = _brushSize.asStateFlow()
     val brushSizeRange = MIN_BRUSH_SIZE..MAX_BRUSH_SIZE
-
-    private val _brushType: MutableStateFlow<BrushType> = MutableStateFlow(DEFAULT_BRUSH_TYPE)
-    val brushType: StateFlow<BrushType> = _brushType.asStateFlow()
     val brushTypes = BrushType.entries
 
+    private val _finishedStrokes: MutableStateFlow<Set<Stroke>> = MutableStateFlow(emptySet())
+    val finishedStrokes: StateFlow<Set<Stroke>> = _finishedStrokes.asStateFlow()
+
     fun onBrushColorChanged(color: Long) {
-        viewModelScope.launch {
-            _brushColor.emit(color)
-        }
+        _brush.update { it.copy(color = color) }
     }
 
     fun onBrushSizeChanged(size: Float) {
-        viewModelScope.launch {
-            _brushSize.emit(size)
-        }
+        _brush.update { it.copy(size = size) }
     }
 
     fun onBrushTypeSelected(type: BrushType) {
-        viewModelScope.launch {
-            _brushType.emit(type)
-        }
+        _brush.update { it.copy(brushType = type) }
+    }
+
+    fun onStrokeFinished(strokes: Collection<Stroke>) {
+        _finishedStrokes.update { it + strokes }
     }
 
     companion object {
-        @ColorLong
         private const val DEFAULT_BRUSH_COLOR: Long = 0xFF000000
         private const val DEFAULT_BRUSH_SIZE = 5f
         private const val MIN_BRUSH_SIZE = 1f
         private const val MAX_BRUSH_SIZE = 25f
-        private val DEFAULT_BRUSH_TYPE: BrushType = BrushType.PRESSURE_PEN
+        private const val DEFAULT_BRUSH_EPSILON = 0.1f
+        private val DEFAULT_BRUSH_TYPE: BrushType = BrushType.PRESSURE_PEN_V1
     }
 }

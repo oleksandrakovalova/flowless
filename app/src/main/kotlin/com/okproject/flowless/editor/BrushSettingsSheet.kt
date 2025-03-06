@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.okproject.flowless.R
-import com.okproject.flowless.mapper.toChipItem
+import com.okproject.flowless.domain.model.brush.BrushType
 import com.okproject.flowless.ui.component.chipgroup.ChipGroupSelector
 import com.okproject.flowless.ui.component.colorpicker.ColorPicker
 import com.okproject.flowless.ui.component.slider.SliderSelector
@@ -88,15 +88,18 @@ private fun BrushSettingsSheetPreview() {
             modifier = Modifier.wrapContentSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            var selectedBrushType by remember { mutableStateOf(BrushType.PRESSURE_PEN) }
+            var selectedBrushType by remember { mutableStateOf(BrushType.PRESSURE_PEN_V1) }
             var selectedBrushSize by remember { mutableFloatStateOf(5f) }
             var brushColor by remember { mutableLongStateOf(0xFFFFFFFF) }
             BrushSettingsSheet(
                 selectedBrushType = selectedBrushType,
-                brushTypes = BrushType.entries.map { it.toChipItem() },
-                onBrushTypeSelected = {
-                    selectedBrushType = it
-                },
+                brushTypes = listOf(
+                    BrushTypeChipItem.PressingPen,
+                    BrushTypeChipItem.Marker,
+                    BrushTypeChipItem.Highlighter,
+                    BrushTypeChipItem.DashedLine
+                ),
+                onBrushTypeSelected = { selectedBrushType = it },
                 selectedBrushSize = selectedBrushSize,
                 brushSizeRange = 1f..25f,
                 onBrushSizeChanged = {

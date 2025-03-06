@@ -23,8 +23,8 @@ import androidx.ink.authoring.InProgressStrokesView
 import androidx.ink.brush.Brush
 import androidx.ink.brush.BrushFamily
 import androidx.ink.rendering.android.canvas.CanvasStrokeRenderer
-import androidx.ink.strokes.Stroke
 import androidx.input.motionprediction.MotionEventPredictor
+import com.okproject.flowless.InkStroke
 
 @SuppressLint("ClickableViewAccessibility")
 @Composable
@@ -32,9 +32,11 @@ fun InkCanvas(
     brushFamily: BrushFamily,
     @ColorLong brushColor: Long,
     brushSize: Float,
+    initialFinishedStrokes: Set<InkStroke>,
+    onStrokeFinished: (Collection<InkStroke>) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var finishedStrokes by remember { mutableStateOf(emptySet<Stroke>()) }
+    var finishedStrokes by remember { mutableStateOf(initialFinishedStrokes) }
     val inProgressStrokesView: InProgressStrokesView = rememberInProgressStrokesView()
     val strokeAuthoringTouchListener = rememberStrokeAuthoringTouchListener(
         brushFamily = brushFamily,
@@ -59,8 +61,9 @@ fun InkCanvas(
                         )
                     addFinishedStrokesListener(
                         object : InProgressStrokesFinishedListener {
-                            override fun onStrokesFinished(strokes: Map<InProgressStrokeId, Stroke>) {
+                            override fun onStrokesFinished(strokes: Map<InProgressStrokeId, InkStroke>) {
                                 finishedStrokes += strokes.values
+                                onStrokeFinished(strokes.values)
                                 removeFinishedStrokes(strokes.keys)
                             }
                         }
@@ -72,7 +75,7 @@ fun InkCanvas(
                 view.setOnTouchListener(strokeAuthoringTouchListener)
             }
         )
-        Canvas(modifier = Modifier) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
             val canvasTransform = Matrix()
             drawContext.canvas.nativeCanvas.concat(canvasTransform)
             val canvas = drawContext.canvas.nativeCanvas

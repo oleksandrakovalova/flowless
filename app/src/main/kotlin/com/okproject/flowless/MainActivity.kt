@@ -39,9 +39,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             KoinContext {
                 FlowlessTheme {
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize()
+                    ) { innerPaddings ->
                         NoteEditorScreen(
-                            modifier = Modifier.padding(innerPadding)
+                            modifier = Modifier
+                                .padding(top = innerPaddings.calculateTopPadding())
                         )
                     }
                 }
