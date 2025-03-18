@@ -6,6 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +23,11 @@ fun SliderSelector(
     modifier: Modifier = Modifier
 ) {
     var sliderPosition by remember { mutableFloatStateOf(position) }
+
+    LaunchedEffect(position) {
+        sliderPosition = position
+    }
+
     Slider(
         modifier = modifier,
         value = sliderPosition,

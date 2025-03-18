@@ -84,8 +84,8 @@ class StrokeAuthoringTouchListener(
         view: InProgressStrokesView,
         prediction: MotionEvent?
     ) {
-        val pointerId = checkNotNull(currentPointerId)
-        val strokeId = checkNotNull(currentStrokeId)
+        val pointerId = currentPointerId ?: return
+        val strokeId = currentStrokeId ?: return
 
         for (pointerIndex in 0 until event.pointerCount) {
             if (event.getPointerId(pointerIndex) != pointerId) continue
@@ -103,8 +103,8 @@ class StrokeAuthoringTouchListener(
         view: InProgressStrokesView
     ) {
         val pointerId = event.getPointerId()
-        check(pointerId == currentPointerId)
-        val strokeId = checkNotNull(currentStrokeId)
+        if(pointerId != currentPointerId) return
+        val strokeId = currentStrokeId ?: return
         view.finishStroke(
             event,
             pointerId,
@@ -117,9 +117,9 @@ class StrokeAuthoringTouchListener(
         view: InProgressStrokesView
     ) {
         val pointerId = event.getPointerId()
-        check(pointerId == currentPointerId)
+        if (pointerId != currentPointerId) return
 
-        val strokeId = checkNotNull(currentStrokeId)
+        val strokeId = currentStrokeId ?: return
         view.cancelStroke(strokeId, event)
     }
 

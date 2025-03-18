@@ -7,19 +7,20 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.dp
 import com.github.skydoves.colorpicker.compose.AlphaSlider
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
 import com.github.skydoves.colorpicker.compose.ColorPickerController
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
-import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import com.okproject.flowless.ui.theme.Dimens
 import com.okproject.flowless.ui.theme.FlowlessTheme
 
 @Composable
@@ -27,8 +28,15 @@ fun ColorPicker(
     selectedColor: Color,
     onColorChanged: (Color) -> Unit,
     modifier: Modifier = Modifier,
-    colorPickerController: ColorPickerController = rememberColorPickerController()
-    ) {
+    colorPickerController: ColorPickerController = rememberColorPickerController(debounce = COLOR_PICKER_DEBOUNCE)
+) {
+    LaunchedEffect(selectedColor) {
+        colorPickerController.selectByColor(
+            color = selectedColor,
+            fromUser = false
+        )
+    }
+
     Column(
         modifier = modifier
     ) {
@@ -36,13 +44,15 @@ fun ColorPicker(
             modifier = Modifier
                 .weight(1f)
                 .padding(
-                    vertical = 0.dp,
-                    horizontal = 32.dp
+                    horizontal = Dimens.largePadding
                 ),
             controller = colorPickerController,
             initialColor = selectedColor,
             onColorChanged = { colorEnvelop ->
-                onColorChanged(colorEnvelop.color)
+                if (colorEnvelop.fromUser) {
+                    val color = colorEnvelop.color
+                    onColorChanged(color)
+                }
             }
         )
         AlphaSlider(
@@ -58,6 +68,17 @@ fun ColorPicker(
     }
 }
 
+@Composable
+private fun rememberColorPickerController(debounce: Long): ColorPickerController {
+    val scope = rememberCoroutineScope()
+    return remember {
+        ColorPickerController(scope).apply {
+            debounceDuration = debounce
+        }
+    }
+}
+
+private const val COLOR_PICKER_DEBOUNCE: Long = 100L
 @PreviewLightDark
 @Composable
 private fun ColorPickerPreview() {

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_package = "com.okproject.flowless.data.model";
+option java_multiple_files = true;
+
+enum BrushTypeOption {
+    PRESSURE_PEN_V1 = 0;
+    MARKER_V1 = 1;
+    HIGHLIGHTER_V1 = 2;
+    DASHED_LINE_V1 = 3;
+}
+
+message BrushOption {
+  BrushTypeOption type = 1;
+  int64 color = 2;
+  float size = 3;
+  float epsilon = 4;
+}

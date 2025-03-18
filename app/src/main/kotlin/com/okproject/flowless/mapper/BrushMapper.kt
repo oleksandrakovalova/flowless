@@ -13,9 +13,9 @@ object BrushMapper {
         )
 
     fun mapToInkBrush(brush: Brush): InkBrush =
-        InkBrush.createWithColorLong(
+        InkBrush.createWithColorIntArgb(
             family = BrushTypeMapper.mapToBrushFamily(brush.brushType),
-            colorLong = brush.color,
+            colorIntArgb = brush.color.toInt(),
             size = brush.size,
             epsilon = brush.epsilon
         )

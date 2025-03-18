@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.okproject.flowless.R
 import com.okproject.flowless.domain.model.brush.BrushType
+import com.okproject.flowless.ext.colorValue
 import com.okproject.flowless.ui.component.chipgroup.ChipGroupSelector
 import com.okproject.flowless.ui.component.colorpicker.ColorPicker
 import com.okproject.flowless.ui.component.slider.SliderSelector
@@ -74,7 +75,7 @@ fun BrushSettingsSheet(
         ColorPicker(
             selectedColor = Color(brushColor),
             onColorChanged = {
-                onBrushColorChanged(it.value.toLong())
+                onBrushColorChanged(it.colorValue())
             }
         )
     }
